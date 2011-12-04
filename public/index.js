@@ -2,8 +2,11 @@ window.onload = function() {
 
 //// CLASS: ConnectionList
 // scaleFactor: scale factor [ms/px]
-function ConnectionList(container, scaleFactor) {
+function ConnectionList(container, infoContainer, scaleFactor) {
     var self = this;
+    
+    this.infoContainer = infoContainer
+    infoContainer.appendChild(document.createTextNode(scaleFactor + " ms / pixel (that's "+(1000/scaleFactor)+" pixels / second)"))
     
     this.container = container;
     this.connections = [];
@@ -88,7 +91,7 @@ Connection._id = 0;
 // ============================================================
 
 var body = document.getElementsByTagName('body')[0]
-var conlist = new ConnectionList(body, 10)
+var conlist = new ConnectionList(document.getElementById('conlist'), document.getElementById('conlistInfo'), 10)
 //var con = conlist.makeConnection();
 //con.addEvent('recv', +Date.now());
 //con.addEvent('send', +Date.now()-2000);
