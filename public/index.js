@@ -7,6 +7,7 @@ function ConnectionList(container, scaleFactor) {
     
     this.container = container;
     this.connections = [];
+    this.cons = {};
     this.scaleFactor = scaleFactor;
     this.startTime = Date.now();
     this.pixelShift = 0;
@@ -69,6 +70,15 @@ Connection.prototype.tick = function() {
         child.style.right = right+'px';
         if (child.offsetLeft < 0) {
           self.div.removeChild(child)
+          if (child.className === 'err') {
+            // no more events here, drop it
+            // TODO this part seems to be kinda un-decoupled to me
+            delete self.list.cons[self.socketid]
+            var index = self.list.connections.indexOf(self)
+            if (index < 0) throw new Error("oh no, we're all gonna die!")
+            self.list.connections.splice(index, 1)
+            self.list.container.removeChild(self.div)
+          }
         }
     });
 };
@@ -79,7 +89,6 @@ Connection._id = 0;
 
 var body = document.getElementsByTagName('body')[0]
 var conlist = new ConnectionList(body, 10)
-var cons = {}
 //var con = conlist.makeConnection();
 //con.addEvent('recv', +Date.now());
 //con.addEvent('send', +Date.now()-2000);
@@ -89,19 +98,20 @@ DNode({handleEvents: function(events) {
   events.forEach(function(event) {
     if (event.type === 'connect') {
       var con = conlist.makeConnection(event.localport, event.remotehost, event.remoteport)
-      conlist[event.socket] = con
+      con.socketid = event.socket
+      conlist.cons[event.socket] = con
     } else if (event.type === 'write') {
-      var con = conlist[event.socket]
+      var con = conlist.cons[event.socket]
       if (con) {
         con.addEvent('send', event.time)
       }
     } else if (event.type === 'data') {
-      var con = conlist[event.socket]
+      var con = conlist.cons[event.socket]
       if (con) {
         con.addEvent('recv', event.time)
       }
     } else if (event.type === 'close') {
-      var con = conlist[event.socket]
+      var con = conlist.cons[event.socket]
       if (con) {
         con.addEvent('err', event.time)
       }
