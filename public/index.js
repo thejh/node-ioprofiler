@@ -94,13 +94,16 @@ DNode({handleEvents: function(events) {
       var con = conlist[event.socket]
       if (con) {
         con.addEvent('send', event.time)
-        console.log('send!')
       }
     } else if (event.type === 'data') {
       var con = conlist[event.socket]
       if (con) {
         con.addEvent('recv', event.time)
-        console.log('recv!')
+      }
+    } else if (event.type === 'close') {
+      var con = conlist[event.socket]
+      if (con) {
+        con.addEvent('err', event.time)
       }
     }
   })
