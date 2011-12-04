@@ -2,6 +2,12 @@
 <html>
   <head>
     <style>
+.conlistCanvas {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
 .connection {
     height: 20px;
     position: relative;
@@ -53,6 +59,7 @@
   </head>
   <body>
     <div id="conlist">
+      <canvas id="clcanvas" class="conlistCanvas" width="1" height="1"></canvas>
     </div>
     Symbols: <img src="up.png"> upload, <img src="down.png"> download, <img src="error.png"> disconnect
     <div id="conlistInfo">

@@ -1,4 +1,5 @@
 var net = require('net'),
+    domains = require('domains')
     EventEmitter = require('events').EventEmitter;
 
 var eventsBuffer = [];
@@ -19,7 +20,9 @@ setInterval(function() {
   }
 }, 1000);
 
-net.Stream.addGenericListener('connect', function(socket) {
+net.Socket.eventDomains = true
+
+net.Socket.addGenericListener('connect', function(socket) {
   socket._ioprofiler_id = nextId++;
   handle(
   { type: 'connect'
@@ -30,14 +33,21 @@ net.Stream.addGenericListener('connect', function(socket) {
   });
 });
 
-net.Stream.addGenericListener('close', function(socket) {
+net.Socket.addGenericListener('close', function(socket) {
   handle({type: 'close', socket: socket._ioprofiler_id});
 });
 
-net.Stream.addGenericListener('data', function(socket, data) {
-  handle({type: 'data', socket: socket._ioprofiler_id, dataLength: data.length});
+net.Socket.addGenericListener('data', function(socket, data, eventId) {
+  handle({type: 'data', socket: socket._ioprofiler_id, dataLength: data.length, eventId: eventId});
 });
 
-net.Stream.addGenericListener('write', function(socket, data) {
-  handle({type: 'write',  socket: socket._ioprofiler_id, dataLength: data.length});
+net.Socket.addGenericListener('write', function(socket, data) {
+  var domain = domains.getCurrent()
+  var causeID = null
+  do {
+    if (!domain.isNetDataEventDomain) continue
+    causeID = domain.eventId
+    break
+  } while (domain.callerDomain !== domain && (domain = domain.callerDomain))
+  handle({type: 'write',  socket: socket._ioprofiler_id, dataLength: data.length, causeId: causeID});
 });
