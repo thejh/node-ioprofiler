@@ -16,7 +16,7 @@ function ConnectionList(container, scaleFactor) {
         self.connections.forEach(function(connection) {
             connection.tick();
         });
-    }, 100);
+    }, 20);
 }
 
 ConnectionList.prototype.makeConnection = function(localport, remotehost, remoteport) {
