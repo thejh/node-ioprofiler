@@ -1,0 +1,19 @@
+{
+  "author": "Jann Horn <jannhorn@googlemail.com>",
+  "name": "ioprofiler",
+  "description": "Profile I/O - 'cause that's what matters in the end!",
+  "version": "0.0.0",
+  "homepage": "https://github.com/thejh/node-ioprofiler",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thejh/node-ioprofiler.git"
+  },
+  "engines": {
+    "node": "~0.6.1 || 0.6.1-pre"
+  },
+  "dependencies": {
+    "lightnode": "*"
+  , "dnode": "*"
+  },
+  "devDependencies": {}
+}
