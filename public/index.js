@@ -19,8 +19,8 @@ function ConnectionList(container, scaleFactor) {
     }, 100);
 }
 
-ConnectionList.prototype.makeConnection = function() {
-    var con = new Connection(this);
+ConnectionList.prototype.makeConnection = function(localport, remotehost, remoteport) {
+    var con = new Connection(this, localport, remotehost, remoteport);
     this.container.appendChild(con.div);
     this.connections.push(con);
     return con;
@@ -34,11 +34,18 @@ ConnectionList.prototype.updateTime = function(time) {
 
 
 //// CLASS Connection
-function Connection(list) {
-    this.list = list;
-    this.id = ++Connection._id;
-    this.div = document.createElement('div');
-    this.div.className = 'connection';
+function Connection(list, localport, remotehost, remoteport) {
+  this.list = list
+  this.id = ++Connection._id
+  
+  this.div = document.createElement('div')
+  this.div.className = 'connection'
+  
+  var labelText = localport + '\n' + remotehost + ':' + remoteport
+  this.labelDiv = document.createElement('div')
+  this.labelDiv.className = 'connlabel'
+  this.labelDiv.appendChild(document.createTextNode(labelText))
+  this.div.appendChild(this.labelDiv)
 }
 
 Connection.prototype.addEvent = function(type, time) {
@@ -57,6 +64,7 @@ Connection.prototype.tick = function() {
     var children = [].slice.call(this.div.children);
     children.forEach(function(child) {
         var pos0 = +child.getAttribute('data-pos0');
+        if (pos0 == null) return
         var right = pos0 + self.list.pixelShift;
         child.style.right = right+'px';
         if (child.offsetLeft < 0) {
@@ -80,7 +88,7 @@ DNode({handleEvents: function(events) {
   console.log(events.map(function(evt){return JSON.stringify(evt)}).join('\n'))
   events.forEach(function(event) {
     if (event.type === 'connect') {
-      var con = conlist.makeConnection()
+      var con = conlist.makeConnection(event.localport, event.remotehost, event.remoteport)
       conlist[event.socket] = con
     } else if (event.type === 'write') {
       var con = conlist[event.socket]

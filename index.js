@@ -21,7 +21,13 @@ setInterval(function() {
 
 net.Stream.addGenericListener('connect', function(socket) {
   socket._ioprofiler_id = nextId++;
-  handle({type: 'connect', socket: socket._ioprofiler_id});
+  handle(
+  { type: 'connect'
+  , socket: socket._ioprofiler_id
+  , localport: socket.address().port
+  , remotehost: socket.remoteAddress
+  , remoteport: socket.remotePort
+  });
 });
 
 net.Stream.addGenericListener('close', function(socket) {
